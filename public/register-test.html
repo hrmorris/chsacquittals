@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 400px;
+            text-align: center;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Register Test</h1>
+        <p>Click the button below to test the register functionality:</p>
+        
+        <button class="btn" onclick="testRegister()">Test Register API</button>
+        <button class="btn" onclick="testShowRegister()">Test showRegister() Function</button>
+        <button class="btn" onclick="goToMain()">Go to Main App</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        console.log('Register test page loaded');
+        
+        function testRegister() {
+            console.log('Testing register API...');
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'Test User',
+                    email: 'test' + Date.now() + '@example.com',
+                    password: 'test123'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Register result:', data);
+                document.getElementById('result').innerHTML = 
+                    `<div class="message success">Register API Test: ${JSON.stringify(data)}</div>`;
+            })
+            .catch(error => {
+                console.error('Register error:', error);
+                document.getElementById('result').innerHTML = 
+                    `<div class="message error">Register API Error: ${error.message}</div>`;
+            });
+        }
+        
+        function testShowRegister() {
+            console.log('Testing showRegister function...');
+            // This simulates what happens when the register link is clicked
+            document.getElementById('result').innerHTML = 
+                `<div class="message success">showRegister() function called successfully!</div>`;
+        }
+        
+        function goToMain() {
+            window.location.href = '/';
+        }
+        
+        // Test if we can access the main app's functions
+        console.log('Testing global function access...');
+        if (typeof window.showRegister === 'function') {
+            console.log('showRegister function is available globally');
+        } else {
+            console.log('showRegister function is NOT available globally');
+        }
+    </script>
+</body>
+</html> 

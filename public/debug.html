@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHS Acquittals - Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        .btn { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>CHS Acquittals - Debug Page</h1>
+    
+    <div class="test-section">
+        <h2>Server Health Test</h2>
+        <button class="btn" onclick="testHealth()">Test Server Health</button>
+        <div id="healthResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Registration Test</h2>
+        <form id="testRegisterForm">
+            <input type="text" id="testName" placeholder="Name" value="Test User"><br>
+            <input type="email" id="testEmail" placeholder="Email" value="test@example.com"><br>
+            <input type="password" id="testPassword" placeholder="Password" value="test123"><br>
+            <button type="submit" class="btn">Test Register</button>
+        </form>
+        <div id="registerResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Login Test</h2>
+        <form id="testLoginForm">
+            <input type="email" id="loginEmail" placeholder="Email" value="admin@chsacquittals.com"><br>
+            <input type="password" id="loginPassword" placeholder="Password" value="admin123"><br>
+            <button type="submit" class="btn">Test Login</button>
+        </form>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Quick Links</h2>
+        <a href="/" class="btn">Go to Main Application</a>
+        <a href="/test" class="btn">Go to Test Page</a>
+        <a href="/health" class="btn">Health Check</a>
+    </div>
+
+    <script>
+        async function testHealth() {
+            try {
+                const response = await fetch('/health');
+                const result = await response.text();
+                document.getElementById('healthResult').innerHTML = 
+                    `<div class="success">Server is running: ${result}</div>`;
+            } catch (error) {
+                document.getElementById('healthResult').innerHTML = 
+                    `<div class="error">Health check failed: ${error.message}</div>`;
+            }
+        }
+
+        document.getElementById('testRegisterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('testName').value;
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+
+            try {
+                console.log('Attempting registration with:', { name, email, password: '***' });
+                
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                console.log('Registration response status:', response.status);
+                const result = await response.json();
+                console.log('Registration result:', result);
+                
+                if (response.ok) {
+                    document.getElementById('registerResult').innerHTML = 
+                        `<div class="success">Registration successful: ${JSON.stringify(result)}</div>`;
+                } else {
+                    document.getElementById('registerResult').innerHTML = 
+                        `<div class="error">Registration failed: ${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                document.getElementById('registerResult').innerHTML = 
+                    `<div class="error">Registration error: ${error.message}</div>`;
+            }
+        });
+
+        document.getElementById('testLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('loginResult').innerHTML = 
+                        `<div class="success">Login successful: ${JSON.stringify(result)}</div>`;
+                } else {
+                    document.getElementById('loginResult').innerHTML = 
+                        `<div class="error">Login failed: ${result.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = 
+                    `<div class="error">Login error: ${error.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html> 

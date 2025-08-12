@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHS Acquittals - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        .login-card h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .link-btn:hover {
+            color: #5a6fd8;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-tab:hover {
+            background: #5a6fd8;
+            color: white;
+        }
+
+        .content-area {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+        }
+
+        /* Upload Forms Styles */
+        .upload-forms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .upload-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s;
+        }
+
+        .upload-form:hover {
+            border-color: #667eea;
+        }
+
+        .upload-form h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .upload-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .upload-form input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .upload-form input[type="file"]:hover {
+            border-color: #667eea;
+        }
+
+        .upload-form .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        #uploadSummary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        #uploadSummary h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        #uploadStats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .upload-stat {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .upload-stat h4 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .upload-stat p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Data Table Styles */
+        .data-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .data-tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: #e9ecef;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .data-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .data-tab:hover {
+            background: #dee2e6;
+            color: #333;
+        }
+
+        .data-table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .data-table {
+            display: none;
+        }
+
+        .data-table.active {
+            display: block;
+        }
+
+        .data-table h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .data-table tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .data-table .btn {
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .data-table .btn:hover {
+            background: #5a6fd8;
+        }
+
+        /* Reports Styles */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .report-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            text-align: center;
+        }
+
+        .report-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .facility-container, .employee-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            min-height: 200px; /* Ensure some height for content */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .analytics-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .analytics-section h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #topSuppliers, #topPositions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            min-height: 150px; /* Ensure some height for content */
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <h1>CHS Acquittals System</h1>
+            <h2>Admin Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <p style="margin-top: 20px; color: #666;">
+                Don't have an account? <button type="button" class="link-btn" id="registerLink">Register</button>
+            </p>
+            <div id="loginMessage"></div>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div id="registerScreen" class="login-screen" style="display: none;">
+        <div class="login-card">
+            <h1>CHS Acquittals System</h1>
+            <h2>Admin Registration</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regName">Full Name:</label>
+                    <input type="text" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password:</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <p style="margin-top: 20px; color: #666;">
+                Already have an account? <button type="button" class="link-btn" id="loginLink">Login</button>
+            </p>
+            <div id="registerMessage"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <div class="container">
+            <div class="header">
+                <h1>CHS Acquittals - Admin Dashboard</h1>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-section="overview">Overview</button>
+                <button class="nav-tab" data-section="upload">Upload Data</button>
+                <button class="nav-tab" data-section="reports">Reports</button>
+                <button class="nav-tab" data-section="data">View Data</button>
+                <button class="nav-tab" data-section="export">Export</button>
+            </div>
+
+            <!-- Overview Section -->
+            <div id="overview" class="content-area section active">
+                <h2>System Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="totalRecords">0</h3>
+                        <p>Total Records</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="totalAmount">$0</h3>
+                        <p>Total Amount</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="facilities">0</h3>
+                        <p>Facilities</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="employees">0</h3>
+                        <p>Employees</p>
+                    </div>
+                </div>
+                <div id="overviewMessage"></div>
+            </div>
+
+            <!-- Upload Section -->
+            <div id="upload" class="content-area section">
+                <h2>Upload Excel Files</h2>
+                <p>Upload your Excel files for processing. Supported formats: .xlsx, .xls</p>
+                
+                <div class="action-buttons" style="margin-bottom: 30px;">
+                    <a href="/data-entry" class="btn" style="text-decoration: none; display: inline-block;">Manual Data Entry</a>
+                </div>
+                
+                <div class="upload-forms">
+                    <!-- Goods and Services Form -->
+                    <div class="upload-form">
+                        <h3>Goods and Services Form</h3>
+                        <form id="goodsServicesForm" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="goodsServicesFile">Select Excel File:</label>
+                                <input type="file" id="goodsServicesFile" name="file" accept=".xlsx,.xls" required>
+                            </div>
+                            <button type="submit" class="btn">Upload Goods & Services</button>
+                        </form>
+                        <div id="goodsServicesMessage"></div>
+                    </div>
+
+                    <!-- Salaries Form 1 -->
+                    <div class="upload-form">
+                        <h3>Salaries Form 1</h3>
+                        <form id="salariesForm1Form" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="salariesForm1File">Select Excel File:</label>
+                                <input type="file" id="salariesForm1File" name="file" accept=".xlsx,.xls" required>
+                            </div>
+                            <button type="submit" class="btn">Upload Salaries Form 1</button>
+                        </form>
+                        <div id="salariesForm1Message"></div>
+                    </div>
+
+                    <!-- Salary Entry Form 2 -->
+                    <div class="upload-form">
+                        <h3>Salary Entry Form 2</h3>
+                        <form id="salaryEntryForm2Form" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="salaryEntryForm2File">Select Excel File:</label>
+                                <input type="file" id="salaryEntryForm2File" name="file" accept=".xlsx,.xls" required>
+                            </div>
+                            <button type="submit" class="btn">Upload Salary Entry Form 2</button>
+                        </form>
+                        <div id="salaryEntryForm2Message"></div>
+                    </div>
+                </div>
+
+                <div id="uploadSummary">
+                    <h3>Upload Summary</h3>
+                    <div id="uploadStats"></div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="reports" class="content-area section">
+                <h2>Reports & Analytics</h2>
+                <p>Comprehensive reports and analytics for your data.</p>
+                
+                <div class="reports-grid">
+                    <!-- Summary Statistics -->
+                    <div class="report-card">
+                        <h3>Summary Statistics</h3>
+                        <div id="summaryStats" class="stats-container">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Goods & Services:</span>
+                                <span class="stat-value" id="goodsServicesTotal">$0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Salaries Form 1:</span>
+                                <span class="stat-value" id="salariesForm1Total">$0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Salary Entry Form 2:</span>
+                                <span class="stat-value" id="salaryEntryForm2Total">$0</span>
+                            </div>
+                            <div class="stat-item total">
+                                <span class="stat-label">Grand Total:</span>
+                                <span class="stat-value" id="grandTotal">$0</span>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="loadSummaryStats()">Refresh Summary</button>
+                    </div>
+
+                    <!-- Facility Summary -->
+                    <div class="report-card">
+                        <h3>Facility Summary</h3>
+                        <div id="facilitySummary" class="facility-container">
+                            <p>Click to load facility summary</p>
+                        </div>
+                        <button class="btn" onclick="loadFacilitySummary()">Load Facility Summary</button>
+                    </div>
+
+                    <!-- Analytics -->
+                    <div class="report-card">
+                        <h3>Analytics</h3>
+                        <div id="analytics" class="analytics-container">
+                            <div class="analytics-section">
+                                <h4>Top Suppliers</h4>
+                                <div id="topSuppliers"></div>
+                            </div>
+                            <div class="analytics-section">
+                                <h4>Top Positions</h4>
+                                <div id="topPositions"></div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="loadAnalytics()">Load Analytics</button>
+                    </div>
+
+                    <!-- Employee Summary -->
+                    <div class="report-card">
+                        <h3>Employee Summary</h3>
+                        <div id="employeeSummary" class="employee-container">
+                            <p>Click to load employee summary</p>
+                        </div>
+                        <button class="btn" onclick="loadEmployeeSummary()">Load Employee Summary</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Section -->
+            <div id="data" class="content-area section">
+                <h2>View All Data</h2>
+                <p>View all uploaded data from the three Excel files.</p>
+                
+                <div class="data-tabs">
+                    <button class="data-tab active" data-table="goods-services">Goods & Services</button>
+                    <button class="data-tab" data-table="salaries-form1">Salaries Form 1</button>
+                    <button class="data-tab" data-table="salary-entry-form2">Salary Entry Form 2</button>
+                </div>
+                
+                <div id="dataTable" class="data-table-container">
+                    <div id="goods-services-table" class="data-table active">
+                        <h3>Goods & Services Data</h3>
+                        <div id="goodsServicesData"></div>
+                    </div>
+                    
+                    <div id="salaries-form1-table" class="data-table">
+                        <h3>Salaries Form 1 Data</h3>
+                        <div id="salariesForm1Data"></div>
+                    </div>
+                    
+                    <div id="salary-entry-form2-table" class="data-table">
+                        <h3>Salary Entry Form 2 Data</h3>
+                        <div id="salaryEntryForm2Data"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div id="export" class="content-area section">
+                <h2>Export Reports</h2>
+                <p>Export functionality will be implemented here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Working app loaded');
+        
+        // Check if user is already logged in
+        const authToken = localStorage.getItem('authToken');
+        if (authToken) {
+            showDashboard();
+        }
+
+        // Setup event listeners using addEventListener instead of onclick
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up event listeners');
+            
+            // Form submissions
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+                console.log('Login form listener added');
+            }
+            
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleRegister);
+                console.log('Register form listener added');
+            }
+            
+            // Navigation links
+            const registerLink = document.getElementById('registerLink');
+            const loginLink = document.getElementById('loginLink');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (registerLink) {
+                registerLink.addEventListener('click', showRegister);
+                console.log('Register link listener added');
+            }
+            
+            if (loginLink) {
+                loginLink.addEventListener('click', showLogin);
+                console.log('Login link listener added');
+            }
+            
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+                console.log('Logout button listener added');
+            }
+            
+            // Dashboard navigation
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    if (sectionId) {
+                        showSection(sectionId);
+                    }
+                });
+            });
+            
+            // Upload form event listeners
+            const goodsServicesForm = document.getElementById('goodsServicesForm');
+            const salariesForm1Form = document.getElementById('salariesForm1Form');
+            const salaryEntryForm2Form = document.getElementById('salaryEntryForm2Form');
+            
+            if (goodsServicesForm) {
+                goodsServicesForm.addEventListener('submit', handleGoodsServicesUpload);
+                console.log('Goods services form listener added');
+            }
+            
+            if (salariesForm1Form) {
+                salariesForm1Form.addEventListener('submit', handleSalariesForm1Upload);
+                console.log('Salaries form 1 listener added');
+            }
+            
+            if (salaryEntryForm2Form) {
+                salaryEntryForm2Form.addEventListener('submit', handleSalaryEntryForm2Upload);
+                console.log('Salary entry form 2 listener added');
+            }
+            
+            // Data table event listeners
+            const dataTabs = document.querySelectorAll('.data-tab');
+            dataTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tableId = this.getAttribute('data-table');
+                    if (tableId) {
+                        switchDataTable(tableId);
+                    }
+                });
+            });
+            
+            console.log('All event listeners set up');
+        });
+
+        function showLogin() {
+            console.log('Showing login screen');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('registerScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+        }
+
+        function showRegister() {
+            console.log('Showing register screen - FUNCTION CALLED');
+            const loginScreen = document.getElementById('loginScreen');
+            const registerScreen = document.getElementById('registerScreen');
+            const dashboard = document.getElementById('dashboard');
+            
+            console.log('Login screen element:', loginScreen);
+            console.log('Register screen element:', registerScreen);
+            console.log('Dashboard element:', dashboard);
+            
+            if (loginScreen) loginScreen.style.display = 'none';
+            if (registerScreen) registerScreen.style.display = 'flex';
+            if (dashboard) dashboard.style.display = 'none';
+            
+            console.log('Register screen should now be visible');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('registerScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            console.log('Login form submitted');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('authToken', result.token);
+                    showDashboard();
+                } else {
+                    document.getElementById('loginMessage').innerHTML = 
+                        `<div class="error">${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('loginMessage').innerHTML = 
+                    `<div class="error">Login failed: ${error.message}</div>`;
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            console.log('Register form submitted');
+            
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('authToken', result.token);
+                    showDashboard();
+                } else {
+                    document.getElementById('registerMessage').innerHTML = 
+                        `<div class="error">${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                document.getElementById('registerMessage').innerHTML = 
+                    `<div class="error">Registration failed: ${error.message}</div>`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            showLogin();
+        }
+
+        // Upload handler functions
+        async function handleGoodsServicesUpload(e) {
+            e.preventDefault();
+            console.log('Goods services upload started');
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('goodsServicesFile');
+            const messageDiv = document.getElementById('goodsServicesMessage');
+            
+            if (!fileInput.files[0]) {
+                messageDiv.innerHTML = '<div class="error">Please select a file</div>';
+                return;
+            }
+            
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/api/data-entry/goods-services', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.innerHTML = `<div class="success">${result.message}. Records processed: ${result.records_processed}</div>`;
+                    fileInput.value = '';
+                    updateUploadStats();
+                } else {
+                    messageDiv.innerHTML = `<div class="error">${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                messageDiv.innerHTML = `<div class="error">Upload failed: ${error.message}</div>`;
+            }
+        }
+
+        async function handleSalariesForm1Upload(e) {
+            e.preventDefault();
+            console.log('Salaries form 1 upload started');
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('salariesForm1File');
+            const messageDiv = document.getElementById('salariesForm1Message');
+            
+            if (!fileInput.files[0]) {
+                messageDiv.innerHTML = '<div class="error">Please select a file</div>';
+                return;
+            }
+            
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/api/data-entry/salaries-form1', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.innerHTML = `<div class="success">${result.message}. Records processed: ${result.records_processed}</div>`;
+                    fileInput.value = '';
+                    updateUploadStats();
+                } else {
+                    messageDiv.innerHTML = `<div class="error">${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                messageDiv.innerHTML = `<div class="error">Upload failed: ${error.message}</div>`;
+            }
+        }
+
+        async function handleSalaryEntryForm2Upload(e) {
+            e.preventDefault();
+            console.log('Salary entry form 2 upload started');
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('salaryEntryForm2File');
+            const messageDiv = document.getElementById('salaryEntryForm2Message');
+            
+            if (!fileInput.files[0]) {
+                messageDiv.innerHTML = '<div class="error">Please select a file</div>';
+                return;
+            }
+            
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/api/data-entry/salary-entry-form2', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.innerHTML = `<div class="success">${result.message}. Records processed: ${result.records_processed}</div>`;
+                    fileInput.value = '';
+                    updateUploadStats();
+                } else {
+                    messageDiv.innerHTML = `<div class="error">${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                messageDiv.innerHTML = `<div class="error">Upload failed: ${error.message}</div>`;
+            }
+        }
+
+        async function updateUploadStats() {
+            try {
+                const response = await fetch('/api/data-entry/data');
+                const data = await response.json();
+                
+                const statsDiv = document.getElementById('uploadStats');
+                if (statsDiv) {
+                    const goodsServicesCount = data.goods_services ? data.goods_services.length : 0;
+                    const salariesForm1Count = data.salaries_form1 ? data.salaries_form1.length : 0;
+                    const salaryEntryForm2Count = data.salary_entry_form2 ? data.salary_entry_form2.length : 0;
+                    
+                    statsDiv.innerHTML = `
+                        <div class="upload-stat">
+                            <h4>${goodsServicesCount}</h4>
+                            <p>Goods & Services Records</p>
+                        </div>
+                        <div class="upload-stat">
+                            <h4>${salariesForm1Count}</h4>
+                            <p>Salaries Form 1 Records</p>
+                        </div>
+                        <div class="upload-stat">
+                            <h4>${salaryEntryForm2Count}</h4>
+                            <p>Salary Entry Form 2 Records</p>
+                        </div>
+                        <div class="upload-stat">
+                            <h4>${goodsServicesCount + salariesForm1Count + salaryEntryForm2Count}</h4>
+                            <p>Total Records</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error updating upload stats:', error);
+            }
+        }
+
+        function switchDataTable(tableId) {
+            // Remove active class from all tabs and tables
+            document.querySelectorAll('.data-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.data-table').forEach(table => {
+                table.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            document.querySelector(`[data-table="${tableId}"]`).classList.add('active');
+            
+            // Show corresponding table
+            document.getElementById(`${tableId}-table`).classList.add('active');
+            
+            // Load data for the selected table
+            loadTableData(tableId);
+        }
+
+        async function loadTableData(tableId) {
+            try {
+                const response = await fetch('/api/data-entry/data');
+                const data = await response.json();
+                
+                let tableData = [];
+                let containerId = '';
+                
+                switch(tableId) {
+                    case 'goods-services':
+                        tableData = data.goods_services || [];
+                        containerId = 'goodsServicesData';
+                        break;
+                    case 'salaries-form1':
+                        tableData = data.salaries_form1 || [];
+                        containerId = 'salariesForm1Data';
+                        break;
+                    case 'salary-entry-form2':
+                        tableData = data.salary_entry_form2 || [];
+                        containerId = 'salaryEntryForm2Data';
+                        break;
+                }
+                
+                const container = document.getElementById(containerId);
+                if (container) {
+                    if (tableData.length === 0) {
+                        container.innerHTML = '<p>No data available. Please upload files first.</p>';
+                    } else {
+                        container.innerHTML = createDataTable(tableData, tableId);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading table data:', error);
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = '<p class="error">Error loading data. Please try again.</p>';
+                }
+            }
+        }
+
+        function createDataTable(data, tableType) {
+            if (data.length === 0) return '<p>No data available</p>';
+            
+            const headers = Object.keys(data[0]);
+            let tableHTML = '<table><thead><tr>';
+            
+            // Create header row
+            headers.forEach(header => {
+                tableHTML += `<th>${header.replace(/_/g, ' ').toUpperCase()}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            // Create data rows
+            data.forEach(row => {
+                tableHTML += '<tr>';
+                headers.forEach(header => {
+                    let value = row[header];
+                    if (value === null || value === undefined) {
+                        value = '';
+                    }
+                    tableHTML += `<td>${value}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table>';
+            return tableHTML;
+        }
+
+        async function loadAllData() {
+            await loadTableData('goods-services');
+        }
+
+        // Reporting functions
+        async function loadSummaryStats() {
+            try {
+                const response = await fetch('/api/reporting/summary');
+                const data = await response.json();
+                
+                document.getElementById('goodsServicesTotal').textContent = 
+                    `$${data.summary.goods_services_total.toLocaleString()}`;
+                document.getElementById('salariesForm1Total').textContent = 
+                    `$${data.summary.salaries_form1_total.toLocaleString()}`;
+                document.getElementById('salaryEntryForm2Total').textContent = 
+                    `$${data.summary.salary_entry_form2_total.toLocaleString()}`;
+                document.getElementById('grandTotal').textContent = 
+                    `$${data.summary.grand_total.toLocaleString()}`;
+                
+            } catch (error) {
+                console.error('Error loading summary stats:', error);
+            }
+        }
+
+        async function loadFacilitySummary() {
+            try {
+                const response = await fetch('/api/reporting/facility-summary');
+                const data = await response.json();
+                
+                let html = '<div class="facility-summary">';
+                
+                // Goods & Services by facility
+                if (data.goods_services && data.goods_services.length > 0) {
+                    html += '<h4>Goods & Services by Facility</h4>';
+                    html += '<table><thead><tr><th>Facility</th><th>Records</th><th>Total Amount</th></tr></thead><tbody>';
+                    data.goods_services.forEach(facility => {
+                        html += `<tr><td>${facility.facility_name}</td><td>${facility.record_count}</td><td>$${parseFloat(facility.total_amount || 0).toLocaleString()}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+                
+                // Salaries by facility
+                if (data.salaries_form1 && data.salaries_form1.length > 0) {
+                    html += '<h4>Salaries by Facility</h4>';
+                    html += '<table><thead><tr><th>Facility</th><th>Records</th><th>Total Amount</th></tr></thead><tbody>';
+                    data.salaries_form1.forEach(facility => {
+                        html += `<tr><td>${facility.facility_name}</td><td>${facility.record_count}</td><td>$${parseFloat(facility.total_amount || 0).toLocaleString()}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+                
+                html += '</div>';
+                
+                document.getElementById('facilitySummary').innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading facility summary:', error);
+                document.getElementById('facilitySummary').innerHTML = '<p class="error">Error loading facility summary</p>';
+            }
+        }
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/reporting/analytics');
+                const data = await response.json();
+                
+                // Top Suppliers
+                let suppliersHtml = '';
+                if (data.top_suppliers && data.top_suppliers.length > 0) {
+                    suppliersHtml = '<table><thead><tr><th>Supplier</th><th>Transactions</th><th>Total Amount</th></tr></thead><tbody>';
+                    data.top_suppliers.forEach(supplier => {
+                        suppliersHtml += `<tr><td>${supplier.supplier}</td><td>${supplier.transaction_count}</td><td>$${parseFloat(supplier.total_amount || 0).toLocaleString()}</td></tr>`;
+                    });
+                    suppliersHtml += '</tbody></table>';
+                } else {
+                    suppliersHtml = '<p>No supplier data available</p>';
+                }
+                document.getElementById('topSuppliers').innerHTML = suppliersHtml;
+                
+                // Top Positions
+                let positionsHtml = '';
+                if (data.top_positions && data.top_positions.length > 0) {
+                    positionsHtml = '<table><thead><tr><th>Position</th><th>Employees</th><th>Avg Salary</th><th>Total Salary</th></tr></thead><tbody>';
+                    data.top_positions.forEach(position => {
+                        positionsHtml += `<tr><td>${position.position}</td><td>${position.employee_count}</td><td>$${parseFloat(position.avg_salary || 0).toLocaleString()}</td><td>$${parseFloat(position.total_salary || 0).toLocaleString()}</td></tr>`;
+                    });
+                    positionsHtml += '</tbody></table>';
+                } else {
+                    positionsHtml = '<p>No position data available</p>';
+                }
+                document.getElementById('topPositions').innerHTML = positionsHtml;
+                
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                document.getElementById('topSuppliers').innerHTML = '<p class="error">Error loading analytics</p>';
+                document.getElementById('topPositions').innerHTML = '<p class="error">Error loading analytics</p>';
+            }
+        }
+
+        async function loadEmployeeSummary() {
+            try {
+                const response = await fetch('/api/reporting/employee-summary');
+                const data = await response.json();
+                
+                let html = '<div class="employee-summary">';
+                
+                // Employees from Form 1
+                if (data.employees && data.employees.length > 0) {
+                    html += '<h4>Employees (Form 1)</h4>';
+                    html += '<table><thead><tr><th>Employee</th><th>Position</th><th>Salary</th><th>Payment Date</th></tr></thead><tbody>';
+                    data.employees.forEach(employee => {
+                        html += `<tr><td>${employee.employee_name}</td><td>${employee.position}</td><td>$${parseFloat(employee.salary_amount || 0).toLocaleString()}</td><td>${employee.payment_date || 'N/A'}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+                
+                // Employee details from Form 2
+                if (data.employee_details && data.employee_details.length > 0) {
+                    html += '<h4>Employee Details (Form 2)</h4>';
+                    html += '<table><thead><tr><th>Employee</th><th>Position</th><th>Basic Salary</th><th>Net Salary</th><th>Status</th></tr></thead><tbody>';
+                    data.employee_details.forEach(employee => {
+                        html += `<tr><td>${employee.employee_name}</td><td>${employee.position}</td><td>$${parseFloat(employee.basic_salary || 0).toLocaleString()}</td><td>$${parseFloat(employee.net_salary || 0).toLocaleString()}</td><td>${employee.payment_status || 'N/A'}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
+                
+                html += '</div>';
+                
+                document.getElementById('employeeSummary').innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading employee summary:', error);
+                document.getElementById('employeeSummary').innerHTML = '<p class="error">Error loading employee summary</p>';
+            }
+        }
+        
+        console.log('All functions defined');
+    </script>
+</body>
+</html> 
