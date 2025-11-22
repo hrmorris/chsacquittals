@@ -1,5 +1,6 @@
 // Browser-compatible TypeScript app
-const API_BASE_URL = 'http://localhost:3001';
+// Allow overriding via window.APP_API_BASE_URL but fall back to same-origin requests
+const API_BASE_URL = (window as any).APP_API_BASE_URL || window.location.origin;
 
 interface User {
     id: number;

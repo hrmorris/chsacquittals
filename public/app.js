@@ -1,5 +1,6 @@
 // Browser-compatible JavaScript app
-const API_BASE_URL = 'http://localhost:3001';
+// Prefer a configurable global but default to the same origin as the page
+const API_BASE_URL = window.APP_API_BASE_URL || window.location.origin;
 
 class ApiService {
     constructor() {
