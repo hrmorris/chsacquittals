@@ -1,6 +1,6 @@
 // Browser-compatible TypeScript app
 // Allow overriding via window.APP_API_BASE_URL but fall back to same-origin requests
-const API_BASE_URL = (window as any).APP_API_BASE_URL || window.location.origin;
+const API_BASE_URL = ((window as any).APP_API_BASE_URL || window.location.origin).replace(/\/$/, '');
 
 interface User {
     id: number;
@@ -32,15 +32,18 @@ interface ApiResponse<T> {
 }
 
 class ApiService {
-    private baseUrl: string = '/api';
+    private baseUrl: string = `${API_BASE_URL}/api`;
     private token: string | null = localStorage.getItem('authToken');
 
     private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
         const url = `${this.baseUrl}${endpoint}`;
         const headers: HeadersInit = {
-            'Content-Type': 'application/json',
             ...options.headers
         };
+
+        if (!(options.body instanceof FormData)) {
+            headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+        }
 
         if (this.token) {
             headers['Authorization'] = `Bearer ${this.token}`;

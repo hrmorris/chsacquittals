@@ -1,19 +1,22 @@
 // Browser-compatible JavaScript app
 // Prefer a configurable global but default to the same origin as the page
-const API_BASE_URL = window.APP_API_BASE_URL || window.location.origin;
+const API_BASE_URL = (window.APP_API_BASE_URL || window.location.origin).replace(/\/$/, '');
 
 class ApiService {
     constructor() {
-        this.baseUrl = '/api';
+        this.baseUrl = `${API_BASE_URL}/api`;
         this.token = localStorage.getItem('authToken');
     }
 
     async request(endpoint, options = {}) {
         const url = `${this.baseUrl}${endpoint}`;
         const headers = {
-            'Content-Type': 'application/json',
             ...options.headers
         };
+
+        if (!(options.body instanceof FormData)) {
+            headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+        }
 
         if (this.token) {
             headers['Authorization'] = `Bearer ${this.token}`;

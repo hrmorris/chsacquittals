@@ -14,9 +14,18 @@ import {
   ApiResponse
 } from '../types/frontend';
 
+const DEFAULT_API_BASE =
+  typeof window !== 'undefined'
+    ? `${(((window as any).APP_API_BASE_URL) || window.location.origin).replace(/\/$/, '')}/api`
+    : '/api';
+
 class ApiService {
-  private baseUrl: string = '/api';
+  private baseUrl: string;
   private token: string | null = localStorage.getItem('authToken');
+
+  constructor(customBaseUrl?: string) {
+    this.baseUrl = customBaseUrl || DEFAULT_API_BASE;
+  }
 
   private async request<T>(
     endpoint: string, 
@@ -24,9 +33,14 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
       ...options.headers
     };
+
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
+    if (!isFormData) {
+      headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+    }
 
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;
