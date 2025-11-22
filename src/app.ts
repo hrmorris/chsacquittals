@@ -2,7 +2,7 @@ import { apiService } from './services/api';
 import { User, AuthState, DashboardStats, SystemSettings, UserPreferences, Notification } from './types/frontend';
 
 // Configuration
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = ((window as any).APP_API_BASE_URL || window.location.origin).replace(/\/$/, '');
 
 class CHSApp {
     private authState: AuthState = {

@@ -47,30 +47,30 @@ router.get('/overview', authenticateToken, async (req, res) => {
     const userId = req.user?.id;
 
     // Get total records
-    const goodsServicesCount = await executeQuery('SELECT COUNT(*) as count FROM goods_services');
-    const salariesForm1Count = await executeQuery('SELECT COUNT(*) as count FROM salaries_form1');
-    const salaryEntryForm2Count = await executeQuery('SELECT COUNT(*) as count FROM salary_entry_form2');
+    const goodsServicesCount = await executeQuery('SELECT COUNT(*) as count FROM goods_services_data');
+    const salariesForm1Count = await executeQuery('SELECT COUNT(*) as count FROM salaries_form1_data');
+    const salaryEntryForm2Count = await executeQuery('SELECT COUNT(*) as count FROM salary_entry_form2_data');
 
     // Get total amounts
-    const goodsServicesTotal = await executeQuery('SELECT SUM(total_cost) as total FROM goods_services');
-    const salariesForm1Total = await executeQuery('SELECT SUM(salary_amount) as total FROM salaries_form1');
-    const salaryEntryForm2Total = await executeQuery('SELECT SUM(net_salary) as total FROM salary_entry_form2');
+    const goodsServicesTotal = await executeQuery('SELECT SUM(total_cost) as total FROM goods_services_data');
+    const salariesForm1Total = await executeQuery('SELECT SUM(salary_amount) as total FROM salaries_form1_data');
+    const salaryEntryForm2Total = await executeQuery('SELECT SUM(net_salary) as total FROM salary_entry_form2_data');
 
     // Get unique facilities
-    const facilitiesCount = await executeQuery('SELECT COUNT(DISTINCT facility_name) as count FROM goods_services');
+    const facilitiesCount = await executeQuery('SELECT COUNT(DISTINCT facility_name) as count FROM goods_services_data');
 
     // Get unique employees
-    const employeesForm1 = await executeQuery('SELECT COUNT(DISTINCT employee_name) as count FROM salaries_form1');
-    const employeesForm2 = await executeQuery('SELECT COUNT(DISTINCT employee_name) as count FROM salary_entry_form2');
+    const employeesForm1 = await executeQuery('SELECT COUNT(DISTINCT employee_name) as count FROM salaries_form1_data');
+    const employeesForm2 = await executeQuery('SELECT COUNT(DISTINCT employee_name) as count FROM salary_entry_form2_data');
 
     // Get recent uploads (last 7 days)
     const recentUploads = await executeQuery(
       `SELECT COUNT(*) as count FROM (
-        SELECT created_at FROM goods_services WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        SELECT uploaded_at FROM goods_services_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         UNION ALL
-        SELECT created_at FROM salaries_form1 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        SELECT uploaded_at FROM salaries_form1_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         UNION ALL
-        SELECT created_at FROM salary_entry_form2 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        SELECT uploaded_at FROM salary_entry_form2_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
       ) as recent_uploads`
     );
 
@@ -100,12 +100,12 @@ router.get('/charts', authenticateToken, async (req, res) => {
     // Get monthly data for the last 12 months
     const monthlyData = await executeQuery(`
       SELECT 
-        DATE_FORMAT(created_at, '%Y-%m') as month,
+        DATE_FORMAT(uploaded_at, '%Y-%m') as month,
         SUM(total_cost) as goods_services_amount,
         COUNT(*) as goods_services_count
-      FROM goods_services 
-      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-      GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+      FROM goods_services_data 
+      WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+      GROUP BY DATE_FORMAT(uploaded_at, '%Y-%m')
       ORDER BY month
     `);
 
@@ -115,7 +115,7 @@ router.get('/charts', authenticateToken, async (req, res) => {
         facility_name,
         SUM(total_cost) as total_amount,
         COUNT(*) as record_count
-      FROM goods_services 
+      FROM goods_services_data 
       GROUP BY facility_name 
       ORDER BY total_amount DESC 
       LIMIT 10
@@ -126,7 +126,7 @@ router.get('/charts', authenticateToken, async (req, res) => {
       SELECT 
         employee_name,
         SUM(salary_amount) as total_salary
-      FROM salaries_form1 
+      FROM salaries_form1_data 
       GROUP BY employee_name 
       ORDER BY total_salary DESC 
       LIMIT 10
@@ -180,21 +180,21 @@ router.get('/recent-activity', authenticateToken, async (req, res) => {
         'upload' as type,
         CONCAT('Uploaded ', 
           CASE 
-            WHEN table_name = 'goods_services' THEN 'Goods & Services'
-            WHEN table_name = 'salaries_form1' THEN 'Salaries Form 1'
-            WHEN table_name = 'salary_entry_form2' THEN 'Salary Entry Form 2'
+            WHEN dataset = 'goods_services' THEN 'Goods & Services'
+            WHEN dataset = 'salaries_form1' THEN 'Salaries Form 1'
+            WHEN dataset = 'salary_entry_form2' THEN 'Salary Entry Form 2'
           END, ' data'
         ) as description,
-        created_at as timestamp,
+        upload_time as timestamp,
         'System' as user
       FROM (
-        SELECT 'goods_services' as table_name, created_at FROM goods_services 
+        SELECT 'goods_services' as dataset, uploaded_at as upload_time FROM goods_services_data 
         UNION ALL
-        SELECT 'salaries_form1' as table_name, created_at FROM salaries_form1 
+        SELECT 'salaries_form1' as dataset, uploaded_at as upload_time FROM salaries_form1_data 
         UNION ALL
-        SELECT 'salary_entry_form2' as table_name, created_at FROM salary_entry_form2
+        SELECT 'salary_entry_form2' as dataset, uploaded_at as upload_time FROM salary_entry_form2_data
       ) as all_uploads
-      ORDER BY timestamp DESC
+      ORDER BY upload_time DESC
       LIMIT ?
     `, [Number(limit)]);
 
@@ -221,8 +221,8 @@ router.get('/facility-summary', authenticateToken, async (req, res) => {
         facility_name,
         SUM(total_cost) as goods_services_total,
         COUNT(*) as record_count,
-        MAX(created_at) as last_updated
-      FROM goods_services 
+        MAX(uploaded_at) as last_updated
+      FROM goods_services_data 
       GROUP BY facility_name 
       ORDER BY goods_services_total DESC
     `);
@@ -248,44 +248,44 @@ router.get('/quick-stats', authenticateToken, async (req, res) => {
     // Today's uploads
     const todayUploads = await executeQuery(`
       SELECT COUNT(*) as count FROM (
-        SELECT created_at FROM goods_services WHERE DATE(created_at) = CURDATE()
+        SELECT uploaded_at FROM goods_services_data WHERE DATE(uploaded_at) = CURDATE()
         UNION ALL
-        SELECT created_at FROM salaries_form1 WHERE DATE(created_at) = CURDATE()
+        SELECT uploaded_at FROM salaries_form1_data WHERE DATE(uploaded_at) = CURDATE()
         UNION ALL
-        SELECT created_at FROM salary_entry_form2 WHERE DATE(created_at) = CURDATE()
+        SELECT uploaded_at FROM salary_entry_form2_data WHERE DATE(uploaded_at) = CURDATE()
       ) as today_uploads
     `);
 
     // This week's uploads
     const weekUploads = await executeQuery(`
       SELECT COUNT(*) as count FROM (
-        SELECT created_at FROM goods_services WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        SELECT uploaded_at FROM goods_services_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         UNION ALL
-        SELECT created_at FROM salaries_form1 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        SELECT uploaded_at FROM salaries_form1_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         UNION ALL
-        SELECT created_at FROM salary_entry_form2 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        SELECT uploaded_at FROM salary_entry_form2_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
       ) as week_uploads
     `);
 
     // This month's uploads
     const monthUploads = await executeQuery(`
       SELECT COUNT(*) as count FROM (
-        SELECT created_at FROM goods_services WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        SELECT uploaded_at FROM goods_services_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         UNION ALL
-        SELECT created_at FROM salaries_form1 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        SELECT uploaded_at FROM salaries_form1_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         UNION ALL
-        SELECT created_at FROM salary_entry_form2 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        SELECT uploaded_at FROM salary_entry_form2_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
       ) as month_uploads
     `);
 
     // Total amount this month
     const monthAmount = await executeQuery(`
       SELECT SUM(total) as amount FROM (
-        SELECT SUM(total_cost) as total FROM goods_services WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        SELECT SUM(total_cost) as total FROM goods_services_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         UNION ALL
-        SELECT SUM(salary_amount) as total FROM salaries_form1 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        SELECT SUM(salary_amount) as total FROM salaries_form1_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         UNION ALL
-        SELECT SUM(net_salary) as total FROM salary_entry_form2 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        SELECT SUM(net_salary) as total FROM salary_entry_form2_data WHERE uploaded_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
       ) as month_totals
     `);
 
